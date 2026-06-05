@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Inadimplência por Faixa de Atraso</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #1e293b; padding: 32px 24px; }
+  h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 32px; }
+  .kpi-row { display: flex; gap: 14px; margin-bottom: 32px; justify-content: center; flex-wrap: wrap; }
+  .kpi { background: #fff; border-radius: 12px; padding: 16px 22px; text-align: center; min-width: 160px; border-top: 4px solid; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .kpi.verde   { border-color: #16a34a; }
+  .kpi.amarelo { border-color: #d97706; }
+  .kpi.laranja { border-color: #ea580c; }
+  .kpi.vermelho{ border-color: #dc2626; }
+  .kpi .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600; }
+  .kpi .valor { font-size: 20px; font-weight: 700; color: #1e293b; }
+  .kpi .pct   { font-size: 12px; color: #64748b; margin-top: 4px; }
+  .charts-row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+  .card { background: #fff; border-radius: 14px; padding: 24px; flex: 1; min-width: 300px; max-width: 440px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 18px; text-align: center; text-transform: uppercase; letter-spacing: 0.8px; }
+  .chart-wrap { position: relative; height: 230px; }
+  .legend { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .leg-item { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #334155; }
+  .leg-left { display: flex; align-items: center; gap: 8px; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .leg-val { color: #64748b; font-size: 11px; }
+  .section-title { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px; }
+  .table-card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: #f1f5f9; }
+  thead th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+  thead th.right { text-align: right; }
+  thead th.center { text-align: center; }
+  tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.15s; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody td { padding: 10px 12px; color: #334155; }
+  tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody td.center { text-align: center; }
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge.verde   { background: #dcfce7; color: #15803d; }
+  .badge.amarelo { background: #fef9c3; color: #a16207; }
+  .badge.laranja { background: #ffedd5; color: #c2410c; }
+  .badge.vermelho{ background: #fee2e2; color: #b91c1c; }
+  .previsao { font-size: 12px; color: #64748b; }
+  tfoot td { padding: 10px 12px; font-weight: 700; color: #1e293b; background: #f1f5f9; font-size: 13px; border-top: 2px solid #e2e8f0; }
+  tfoot td.right { text-align: right; }
+  .footer { text-align: center; margin-top: 20px; font-size: 11px; color: #94a3b8; }
+</style>
+</head>
+<body>
+<h1>&#128202; Relatório de Inadimplência</h1>
+<p class="subtitle">Gerado em 05/06/2026 &nbsp;·&nbsp; Total em aberto: <span id="grand-total-subtitle"></span></p>
+<div class="kpi-row">
+  <div class="kpi verde"><div class="label">&#8804; 10 dias</div><div class="valor" id="v1"></div><div class="pct" id="p1"></div></div>
+  <div class="kpi amarelo"><div class="label">11 &ndash; 20 dias</div><div class="valor" id="v2"></div><div class="pct" id="p2"></div></div>
+  <div class="kpi laranja"><div class="label">21 &ndash; 30 dias</div><div class="valor" id="v3"></div><div class="pct" id="p3"></div></div>
+  <div class="kpi vermelho"><div class="label">&gt; 30 dias</div><div class="valor" id="v4"></div><div class="pct" id="p4"></div></div>
+</div>
+<div class="charts-row">
+  <div class="card"><h2>Distribuição % do Total</h2><div class="chart-wrap"><canvas id="doughnut" width="400" height="230"></canvas></div><div class="legend" id="legend1"></div></div>
+  <div class="card"><h2>Valor por Faixa de Atraso</h2><div class="chart-wrap"><canvas id="bar" width="400" height="230"></canvas></div><div class="legend" id="legend2"></div></div>
+</div>
+<div class="table-card">
+  <div class="section-title">&#128203; Listagem de Boletos em Atraso</div>
+  <table>
+    <thead><tr>
+      <th>Cliente</th><th class="right">Principal</th><th class="right">Principal + Juros</th>
+      <th class="center">%</th><th class="center">Dias Atraso</th><th>Faixa</th><th>Previsão</th>
+    </tr></thead>
+    <tbody id="tabela-body"></tbody>
+    <tfoot><tr>
+      <td>TOTAL</td><td class="right" id="tot-principal"></td><td class="right" id="tot-juros"></td>
+      <td></td><td></td><td></td><td></td>
+    </tr></tfoot>
+  </table>
+</div>
+<div class="footer">Mavel Locadora &middot; Relatório interno de inadimplência</div>
+
+<script>
+const rawItems = [{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 337,49","totalJuros":"R$ 351,52","pct":"1,25%","dias":64,"previsao":""},{"cliente":"Transnorth Ltda","principal":"R$ 224,51","totalJuros":"R$ 232,77","pct":"0,82%","dias":50,"previsao":""},{"cliente":"Kallyne Machado dos Santos","principal":"R$ 747,50","totalJuros":"R$ 769,71","pct":"2,73%","dias":29,"previsao":"25/05/2026"},{"cliente":"Wendell Sebastian Souza Moraes","principal":"R$ 650,00","totalJuros":"R$ 669,31","pct":"2,37%","dias":29,"previsao":"05/06/2026"},{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 337,49","totalJuros":"R$ 347,40","pct":"1,23%","dias":28,"previsao":""},{"cliente":"Wendell Sebastian Souza Moraes","principal":"R$ 54,24","totalJuros":"R$ 55,78","pct":"0,20%","dias":25,"previsao":"05/06/2026"},{"cliente":"Wendell Sebastian Souza Moraes","principal":"R$ 2.985,89","totalJuros":"R$ 3.070,59","pct":"10,88%","dias":25,"previsao":"05/06/2026"},{"cliente":"Jamille Evangelista Rodrigues","principal":"R$ 337,49","totalJuros":"R$ 347,06","pct":"1,23%","dias":25,"previsao":"29/05/2026"},{"cliente":"Jotesh Premchand Parwani","principal":"R$ 1.192,03","totalJuros":"R$ 1.224,64","pct":"4,34%","dias":22,"previsao":""},{"cliente":"Jotesh Premchand Parwani","principal":"R$ 4.090,00","totalJuros":"R$ 4.200,53","pct":"14,88%","dias":21,"previsao":""},{"cliente":"Livia Afra Cabral da Silva Fernandes","principal":"R$ 260,00","totalJuros":"R$ 266,94","pct":"0,95%","dias":20,"previsao":""},{"cliente":"Transnorth Ltda","principal":"R$ 224,51","totalJuros":"R$ 230,50","pct":"0,82%","dias":20,"previsao":""},{"cliente":"Transnorth Ltda","principal":"R$ 224,51","totalJuros":"R$ 230,50","pct":"0,82%","dias":20,"previsao":""},{"cliente":"Livia Afra Cabral da Silva Fernandes","principal":"R$ 701,86","totalJuros":"R$ 720,59","pct":"2,55%","dias":20,"previsao":"12/06/2026"},{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 76,38","totalJuros":"R$ 78,34","pct":"0,28%","dias":17,"previsao":""},{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 2.905,20","totalJuros":"R$ 2.979,81","pct":"10,56%","dias":17,"previsao":""},{"cliente":"Jefferson Rodrigues da Silva","principal":"R$ 39,69","totalJuros":"R$ 40,70","pct":"0,14%","dias":16,"previsao":"03/06/2026"},{"cliente":"Jefferson Rodrigues da Silva","principal":"R$ 4.090,00","totalJuros":"R$ 4.193,67","pct":"14,86%","dias":16,"previsao":"03/06/2026"},{"cliente":"Midia Urbana Imagens Ltda","principal":"R$ 370,44","totalJuros":"R$ 378,96","pct":"1,34%","dias":9,"previsao":""},{"cliente":"Macedo & Crispim Ltda","principal":"R$ 224,51","totalJuros":"R$ 229,60","pct":"0,81%","dias":8,"previsao":"03/06/2026"},{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 337,49","totalJuros":"R$ 344,69","pct":"1,22%","dias":4,"previsao":""},{"cliente":"Jefferson Rodrigues da Silva","principal":"R$ 149,68","totalJuros":"R$ 152,87","pct":"0,54%","dias":4,"previsao":""},{"cliente":"Luciana Barros Garcia","principal":"R$ 3.190,00","totalJuros":"R$ 3.256,99","pct":"11,54%","dias":3,"previsao":""},{"cliente":"Joao Matheus De Azevedo Teixeira","principal":"R$ 3.769,20","totalJuros":"R$ 3.848,35","pct":"13,64%","dias":3,"previsao":""},{"cliente":"TOTALIZADOR GERAL","principal":"R$ 27.520,11","totalJuros":"R$ 28.221,83","pct":"100,00%","dias":null,"previsao":""}];
+
+function parseMoney(v) {
+  if (typeof v === 'number') return v;
+  if (!v) return 0;
+  return parseFloat(String(v).replace(/R\$\s?/g,'').replace(/\./g,'').replace(',','.').trim()) || 0;
+}
+const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+const allItems = rawItems.map(item => ({
+  cliente:   item.cliente,
+  principal: parseMoney(item.principal),
+  total:     parseMoney(item.totalJuros),
+  pct:       item.pct,
+  dias:      item.dias,
+  previsao:  item.previsao
+}));
+
+const totalizador = allItems.find(i => i.dias === null || String(i.cliente).toUpperCase().trim() === 'TOTALIZADOR GERAL');
+const boletos     = allItems.filter(i => i.dias !== null && String(i.cliente).toUpperCase().trim() !== 'TOTALIZADOR GERAL');
+
+const faixas = [
+  { label: "\u2264 10 dias",    min: 0,  max: 10,  color: "#16a34a", cls: "verde"   },
+  { label: "11 \u2013 20 dias", min: 11, max: 20,  color: "#d97706", cls: "amarelo" },
+  { label: "21 \u2013 30 dias", min: 21, max: 30,  color: "#ea580c", cls: "laranja" },
+  { label: "> 30 dias",         min: 31, max: 999, color: "#dc2626", cls: "vermelho" },
+];
+function getFaixa(dias) { return faixas.find(f => dias >= f.min && dias <= f.max) || faixas[0]; }
+
+const totals = faixas.map(f => boletos.filter(b => b.dias >= f.min && b.dias <= f.max).reduce((a,b) => a+b.total, 0));
+const grandTotal = totals.reduce((a,b) => a+b, 0);
+const pcts = totals.map(t => grandTotal > 0 ? +((t/grandTotal)*100).toFixed(1) : 0);
+
+["v1","v2","v3","v4"].forEach((id,i) => {
+  document.getElementById(id).textContent = fmt(totals[i]);
+  document.getElementById("p"+(i+1)).textContent = pcts[i]+"% do total";
+});
+
+// Função que cria gráfico doughnut e converte para <img> estática (compatível com PDF)
+function renderDoughnut(canvasId, data, tooltipFn) {
+  const canvas = document.getElementById(canvasId);
+  const chart = new Chart(canvas, {
+    type: "doughnut",
+    data: { labels: faixas.map(f=>f.label), datasets: [{ data, backgroundColor: faixas.map(f=>f.color), borderColor:"#fff", borderWidth:3, hoverOffset:8 }] },
+    options: {
+      responsive: false,
+      animation: {
+        duration: 0,
+        onComplete: function() {
+          // Quando terminar de desenhar, substitui canvas por img estática
+          const img = document.createElement('img');
+          img.src = canvas.toDataURL('image/png');
+          img.style.width = '100%';
+          img.style.height = '100%';
+          canvas.parentNode.replaceChild(img, canvas);
+        }
+      },
+      cutout:"68%",
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label: tooltipFn}} }
+    }
+  });
+}
+
+renderDoughnut("doughnut", pcts, ctx => ` ${ctx.parsed}%  (${fmt(totals[ctx.dataIndex])})`);
+const leg1 = document.getElementById("legend1");
+faixas.forEach((f,i) => { leg1.innerHTML += `<div class="leg-item"><div class="leg-left"><div class="leg-dot" style="background:${f.color}"></div><span>${f.label}</span></div><span class="leg-val">${pcts[i]}% &middot; ${fmt(totals[i])}</span></div>`; });
+
+renderDoughnut("bar", totals, ctx => ` ${fmt(ctx.parsed)}`);
+const leg2 = document.getElementById("legend2");
+faixas.forEach((f,i) => { leg2.innerHTML += `<div class="leg-item"><div class="leg-left"><div class="leg-dot" style="background:${f.color}"></div><span>${f.label}</span></div><span class="leg-val">${fmt(totals[i])}</span></div>`; });
+
+const tbody = document.getElementById("tabela-body");
+let sumP=0, sumT=0;
+boletos.forEach(b => {
+  const f = getFaixa(b.dias);
+  sumP += b.principal; sumT += b.total;
+  tbody.innerHTML += `<tr><td>${b.cliente}</td><td class="right">${fmt(b.principal)}</td><td class="right">${fmt(b.total)}</td><td class="center">${b.pct||'&mdash;'}</td><td class="center">${b.dias}</td><td><span class="badge ${f.cls}">${f.label}</span></td><td class="previsao">${b.previsao||'&mdash;'}</td></tr>`;
+});
+
+document.getElementById("tot-principal").textContent = fmt(totalizador ? totalizador.principal : sumP);
+document.getElementById("tot-juros").textContent     = fmt(totalizador ? totalizador.total     : sumT);
+document.getElementById("grand-total-subtitle").textContent = fmt(totalizador ? totalizador.total : grandTotal);
+</script>
+</body>
+</html>
