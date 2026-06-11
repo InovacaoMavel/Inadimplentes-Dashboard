@@ -8,9 +8,35 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #1e293b; padding: 32px 24px; }
   h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-  .subtitle { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 32px; }
+  .subtitle { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 24px; }
+
+  /* ===== Barra de filtros ===== */
+  .filtros { background: #fff; border-radius: 14px; padding: 18px 22px; margin: 0 auto 28px; max-width: 940px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+  .filtro-grupo { display: flex; flex-direction: column; gap: 5px; }
+  .filtro-grupo label { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; }
+  .filtro-grupo input[type="text"], .filtro-grupo select {
+    border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 13px; color: #1e293b;
+    background: #fff; min-width: 190px; font-family: inherit; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .filtro-grupo input[type="text"]:focus, .filtro-grupo select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1.5px solid #cbd5e1; background: #fff; color: #475569; border-radius: 20px; padding: 6px 13px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .chip:hover { border-color: #94a3b8; }
+  .chip.ativo.verde    { background: #dcfce7; border-color: #16a34a; color: #15803d; }
+  .chip.ativo.amarelo  { background: #fef9c3; border-color: #d97706; color: #a16207; }
+  .chip.ativo.laranja  { background: #ffedd5; border-color: #ea580c; color: #c2410c; }
+  .chip.ativo.vermelho { background: #fee2e2; border-color: #dc2626; color: #b91c1c; }
+  .btn-limpar { border: none; background: #f1f5f9; color: #475569; border-radius: 8px; padding: 9px 16px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+  .btn-limpar:hover { background: #e2e8f0; }
+  .resumo-filtro { width: 100%; font-size: 12px; color: #64748b; margin-top: 2px; }
+  .resumo-filtro strong { color: #1e293b; }
+
   .kpi-row { display: flex; gap: 14px; margin-bottom: 32px; justify-content: center; flex-wrap: wrap; }
-  .kpi { background: #fff; border-radius: 12px; padding: 16px 22px; text-align: center; min-width: 160px; border-top: 4px solid; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .kpi { background: #fff; border-radius: 12px; padding: 16px 22px; text-align: center; min-width: 160px; border-top: 4px solid; box-shadow: 0 1px 4px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.12s, box-shadow 0.12s, opacity 0.15s; }
+  .kpi:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.10); }
+  .kpi.inativo { opacity: 0.38; }
+  body.modo-pdf .kpi { cursor: default; }
+  body.modo-pdf .kpi:hover { transform: none; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   .kpi.verde   { border-color: #16a34a; }
   .kpi.amarelo { border-color: #d97706; }
   .kpi.laranja { border-color: #ea580c; }
@@ -21,13 +47,14 @@
   .charts-row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
   .card { background: #fff; border-radius: 14px; padding: 24px; flex: 1; min-width: 300px; max-width: 440px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   .card h2 { font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 18px; text-align: center; text-transform: uppercase; letter-spacing: 0.8px; }
-  .chart-wrap { position: relative; height: 230px; }
+  .chart-wrap { position: relative; height: 230px; display: flex; justify-content: center; }
   .legend { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
   .leg-item { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #334155; }
   .leg-left { display: flex; align-items: center; gap: 8px; }
   .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .leg-val { color: #64748b; font-size: 11px; }
-  .section-title { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px; }
+  .section-title { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
+  .contador { font-size: 11px; font-weight: 600; color: #64748b; text-transform: none; letter-spacing: 0; }
   .table-card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead tr { background: #f1f5f9; }
@@ -39,6 +66,7 @@
   tbody td { padding: 10px 12px; color: #334155; }
   tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
   tbody td.center { text-align: center; }
+  .vazio { text-align: center; padding: 28px 12px; color: #94a3b8; font-size: 13px; }
   .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
   .badge.verde   { background: #dcfce7; color: #15803d; }
   .badge.amarelo { background: #fef9c3; color: #a16207; }
@@ -48,23 +76,53 @@
   tfoot td { padding: 10px 12px; font-weight: 700; color: #1e293b; background: #f1f5f9; font-size: 13px; border-top: 2px solid #e2e8f0; }
   tfoot td.right { text-align: right; }
   .footer { text-align: center; margin-top: 20px; font-size: 11px; color: #94a3b8; }
+  body.modo-pdf .filtros { display: none; }
 </style>
 </head>
 <body>
 <h1>&#128202; Relatório de Inadimplência</h1>
 <p class="subtitle">Gerado em 11/06/2026 &nbsp;·&nbsp; Total em aberto: <span id="grand-total-subtitle"></span></p>
-<div class="kpi-row">
-  <div class="kpi verde"><div class="label">&#8804; 10 dias</div><div class="valor" id="v1"></div><div class="pct" id="p1"></div></div>
-  <div class="kpi amarelo"><div class="label">11 &ndash; 20 dias</div><div class="valor" id="v2"></div><div class="pct" id="p2"></div></div>
-  <div class="kpi laranja"><div class="label">21 &ndash; 30 dias</div><div class="valor" id="v3"></div><div class="pct" id="p3"></div></div>
-  <div class="kpi vermelho"><div class="label">&gt; 30 dias</div><div class="valor" id="v4"></div><div class="pct" id="p4"></div></div>
+
+<!-- ===== FILTROS ===== -->
+<div class="filtros" id="barra-filtros">
+  <div class="filtro-grupo">
+    <label for="f-busca">Buscar cliente</label>
+    <input type="text" id="f-busca" placeholder="Digite parte do nome...">
+  </div>
+  <div class="filtro-grupo">
+    <label for="f-cliente">Cliente</label>
+    <select id="f-cliente"><option value="">Todos os clientes</option></select>
+  </div>
+  <div class="filtro-grupo">
+    <label>Faixa de atraso</label>
+    <div class="chips" id="chips-faixa"></div>
+  </div>
+  <div class="filtro-grupo">
+    <label for="f-previsao">Previsão de pagamento</label>
+    <select id="f-previsao">
+      <option value="">Todas</option>
+      <option value="com">Com previsão</option>
+      <option value="sem">Sem previsão</option>
+    </select>
+  </div>
+  <button class="btn-limpar" id="btn-limpar">Limpar filtros</button>
+  <div class="resumo-filtro" id="resumo-filtro"></div>
 </div>
+
+<div class="kpi-row" id="kpi-row">
+  <div class="kpi verde" data-faixa="0" title="Clique para filtrar"><div class="label">&#8804; 10 dias</div><div class="valor" id="v1"></div><div class="pct" id="p1"></div></div>
+  <div class="kpi amarelo" data-faixa="1" title="Clique para filtrar"><div class="label">11 &ndash; 20 dias</div><div class="valor" id="v2"></div><div class="pct" id="p2"></div></div>
+  <div class="kpi laranja" data-faixa="2" title="Clique para filtrar"><div class="label">21 &ndash; 30 dias</div><div class="valor" id="v3"></div><div class="pct" id="p3"></div></div>
+  <div class="kpi vermelho" data-faixa="3" title="Clique para filtrar"><div class="label">&gt; 30 dias</div><div class="valor" id="v4"></div><div class="pct" id="p4"></div></div>
+</div>
+
 <div class="charts-row">
   <div class="card"><h2>Distribuição % do Total</h2><div class="chart-wrap"><canvas id="doughnut" width="400" height="230"></canvas></div><div class="legend" id="legend1"></div></div>
-  <div class="card"><h2>Valor por Faixa de Atraso</h2><div class="chart-wrap"><canvas id="bar" width="400" height="230"></canvas></div><div class="legend" id="legend2"></div></div>
+  <div class="card"><h2>Valor por Faixa de Atraso</h2><div class="chart-wrap"><canvas id="bar"></canvas></div><div class="legend" id="legend2"></div></div>
 </div>
+
 <div class="table-card">
-  <div class="section-title">&#128203; Listagem de Boletos em Atraso</div>
+  <div class="section-title"><span>&#128203; Listagem de Boletos em Atraso</span><span class="contador" id="contador"></span></div>
   <table>
     <thead><tr>
       <th>Cliente</th><th class="right">Principal</th><th class="right">Principal + Juros</th>
@@ -81,6 +139,10 @@
 
 <script>
 const rawItems = [{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 337,49","totalJuros":"R$ 352,21","pct":"3,27%","dias":70,"previsao":""},{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 337,49","totalJuros":"R$ 348,09","pct":"3,23%","dias":34,"previsao":""},{"cliente":"Jamille Evangelista Rodrigues","principal":"R$ 337,49","totalJuros":"R$ 347,74","pct":"3,23%","dias":31,"previsao":"29/05/2026"},{"cliente":"Livia Afra Cabral da Silva Fernandes","principal":"R$ 260,00","totalJuros":"R$ 267,46","pct":"2,48%","dias":26,"previsao":""},{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 76,38","totalJuros":"R$ 78,50","pct":"0,73%","dias":23,"previsao":""},{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 2.905,20","totalJuros":"R$ 2.985,66","pct":"27,69%","dias":23,"previsao":""},{"cliente":"Livia Afra Cabral da Silva Fernandes","principal":"R$ 701,86","totalJuros":"R$ 720,83","pct":"6,69%","dias":21,"previsao":"12/06/2026"},{"cliente":"Midia Urbana Imagens Ltda","principal":"R$ 370,44","totalJuros":"R$ 379,71","pct":"3,52%","dias":15,"previsao":""},{"cliente":"Macedo & Crispim Ltda","principal":"R$ 224,51","totalJuros":"R$ 230,05","pct":"2,13%","dias":14,"previsao":"03/06/2026"},{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 337,49","totalJuros":"R$ 345,37","pct":"3,20%","dias":10,"previsao":""},{"cliente":"Macedo & Crispim Ltda","principal":"R$ 222,87","totalJuros":"R$ 227,77","pct":"2,11%","dias":6,"previsao":""},{"cliente":"Macedo & Crispim Ltda","principal":"R$ 3.690,00","totalJuros":"R$ 3.771,19","pct":"34,98%","dias":6,"previsao":""},{"cliente":"Macedo & Crispim Ltda","principal":"R$ 149,68","totalJuros":"R$ 152,97","pct":"1,42%","dias":6,"previsao":""},{"cliente":"Midia Urbana Imagens Ltda","principal":"R$ 337,49","totalJuros":"R$ 344,92","pct":"3,20%","dias":6,"previsao":""},{"cliente":"Jotesh Premchand Parwani","principal":"R$ 224,51","totalJuros":"R$ 229,22","pct":"2,13%","dias":3,"previsao":""},{"cliente":"TOTALIZADOR GERAL","principal":"R$ 10.512,90","totalJuros":"R$ 10.781,68","pct":"100,00%","dias":null,"previsao":""}];
+
+// Modo PDF: definido no Code node ou via ?pdf=1 na URL
+const MODO_PDF = false || new URLSearchParams(location.search).get('pdf') === '1';
+if (MODO_PDF) document.body.classList.add('modo-pdf');
 
 function parseMoney(v) {
   if (typeof v === 'number') return v;
@@ -107,51 +169,78 @@ const faixas = [
   { label: "21 \u2013 30 dias", min: 21, max: 30,  color: "#ea580c", cls: "laranja" },
   { label: "> 30 dias",         min: 31, max: 999, color: "#dc2626", cls: "vermelho" },
 ];
-function getFaixa(dias) { return faixas.find(f => dias >= f.min && dias <= f.max) || faixas[0]; }
+function getFaixaIdx(dias) { const i = faixas.findIndex(f => dias >= f.min && dias <= f.max); return i === -1 ? 0 : i; }
 
-const totals = faixas.map(f => boletos.filter(b => b.dias >= f.min && b.dias <= f.max).reduce((a,b) => a+b.total, 0));
-const grandTotal = totals.reduce((a,b) => a+b, 0);
-const pcts = totals.map(t => grandTotal > 0 ? +((t/grandTotal)*100).toFixed(1) : 0);
+// ===== Estado dos filtros =====
+const estado = { busca: '', cliente: '', faixasAtivas: new Set([0,1,2,3]), previsao: '' };
 
-["v1","v2","v3","v4"].forEach((id,i) => {
-  document.getElementById(id).textContent = fmt(totals[i]);
-  document.getElementById("p"+(i+1)).textContent = pcts[i]+"% do total";
+// ===== Montagem dos controles =====
+const selCliente = document.getElementById('f-cliente');
+[...new Set(boletos.map(b => b.cliente))].sort((a,b) => a.localeCompare(b,'pt-BR')).forEach(c => {
+  const opt = document.createElement('option');
+  opt.value = c; opt.textContent = c;
+  selCliente.appendChild(opt);
 });
 
-// Função que cria gráfico doughnut e converte para <img> estática (compatível com PDF)
-function renderDoughnut(canvasId, data, tooltipFn) {
-  const canvas = document.getElementById(canvasId);
-  const chart = new Chart(canvas, {
-    type: "doughnut",
-    data: { labels: faixas.map(f=>f.label), datasets: [{ data, backgroundColor: faixas.map(f=>f.color), borderColor:"#fff", borderWidth:3, hoverOffset:8 }] },
-    options: {
-      responsive: false,
-      animation: {
-        duration: 0,
-        onComplete: function() {
-          // Quando terminar de desenhar, substitui canvas por img estática
-          const img = document.createElement('img');
-          img.src = canvas.toDataURL('image/png');
-          img.style.width = '100%';
-          img.style.height = '100%';
-          canvas.parentNode.replaceChild(img, canvas);
-        }
-      },
-      cutout:"68%",
-      plugins:{ legend:{display:false}, tooltip:{callbacks:{label: tooltipFn}} }
-    }
-  });
+const chipsWrap = document.getElementById('chips-faixa');
+faixas.forEach((f,i) => {
+  const btn = document.createElement('button');
+  btn.className = 'chip ativo ' + f.cls;
+  btn.textContent = f.label;
+  btn.dataset.faixa = i;
+  btn.addEventListener('click', () => toggleFaixa(i));
+  chipsWrap.appendChild(btn);
+});
+
+function toggleFaixa(i) {
+  if (MODO_PDF) return;
+  if (estado.faixasAtivas.has(i) && estado.faixasAtivas.size === 1) {
+    [0,1,2,3].forEach(n => estado.faixasAtivas.add(n));          // só ela ativa -> restaura todas
+  } else if (estado.faixasAtivas.size === 4) {
+    estado.faixasAtivas.clear(); estado.faixasAtivas.add(i);     // todas ativas -> isola a clicada
+  } else if (estado.faixasAtivas.has(i)) {
+    estado.faixasAtivas.delete(i);
+  } else {
+    estado.faixasAtivas.add(i);
+  }
+  if (estado.faixasAtivas.size === 0) [0,1,2,3].forEach(n => estado.faixasAtivas.add(n));
+  aplicarFiltros();
 }
 
-renderDoughnut("doughnut", pcts, ctx => ` ${ctx.parsed}%  (${fmt(totals[ctx.dataIndex])})`);
-const leg1 = document.getElementById("legend1");
-faixas.forEach((f,i) => { leg1.innerHTML += `<div class="leg-item"><div class="leg-left"><div class="leg-dot" style="background:${f.color}"></div><span>${f.label}</span></div><span class="leg-val">${pcts[i]}% &middot; ${fmt(totals[i])}</span></div>`; });
+document.getElementById('f-busca').addEventListener('input', e => { estado.busca = e.target.value.toLowerCase().trim(); aplicarFiltros(); });
+selCliente.addEventListener('change', e => { estado.cliente = e.target.value; aplicarFiltros(); });
+document.getElementById('f-previsao').addEventListener('change', e => { estado.previsao = e.target.value; aplicarFiltros(); });
+document.getElementById('btn-limpar').addEventListener('click', () => {
+  estado.busca = ''; estado.cliente = ''; estado.previsao = '';
+  [0,1,2,3].forEach(n => estado.faixasAtivas.add(n));
+  document.getElementById('f-busca').value = '';
+  selCliente.value = '';
+  document.getElementById('f-previsao').value = '';
+  aplicarFiltros();
+});
 
-new Chart(document.getElementById("bar"), {
+document.querySelectorAll('.kpi').forEach(k => {
+  k.addEventListener('click', () => toggleFaixa(+k.dataset.faixa));
+});
+
+// ===== Gráficos (instâncias persistentes, atualizadas a cada filtro) =====
+const chartDoughnut = new Chart(document.getElementById("doughnut"), {
+  type: "doughnut",
+  data: { labels: faixas.map(f=>f.label), datasets: [{ data: [0,0,0,0], backgroundColor: faixas.map(f=>f.color), borderColor:"#fff", borderWidth:3, hoverOffset:8 }] },
+  options: {
+    responsive: false,
+    animation: { duration: MODO_PDF ? 0 : 350 },
+    cutout: "68%",
+    plugins: { legend: {display:false}, tooltip: {callbacks:{label: ctx => ' ' + ctx.parsed + '%'}} }
+  }
+});
+
+const chartBar = new Chart(document.getElementById("bar"), {
   type: "bar",
-  data: { labels: faixas.map(f=>f.label), datasets: [{ data: totals, backgroundColor: faixas.map(f=>f.color+"33"), borderColor: faixas.map(f=>f.color), borderWidth:2, borderRadius:8 }] },
+  data: { labels: faixas.map(f=>f.label), datasets: [{ data: [0,0,0,0], backgroundColor: faixas.map(f=>f.color+"33"), borderColor: faixas.map(f=>f.color), borderWidth:2, borderRadius:8 }] },
   options: {
     responsive: true, maintainAspectRatio: false,
+    animation: { duration: MODO_PDF ? 0 : 350 },
     plugins:{ legend:{display:false}, tooltip:{callbacks:{label: ctx => " "+fmt(ctx.parsed.y)}} },
     scales:{
       x:{ticks:{color:"#64748b",font:{size:11}},grid:{color:"#e2e8f0"}},
@@ -159,20 +248,88 @@ new Chart(document.getElementById("bar"), {
     }
   }
 });
-const leg2 = document.getElementById("legend2");
-faixas.forEach((f,i) => { leg2.innerHTML += `<div class="leg-item"><div class="leg-left"><div class="leg-dot" style="background:${f.color}"></div><span>${f.label}</span></div><span class="leg-val">${fmt(totals[i])}</span></div>`; });
 
-const tbody = document.getElementById("tabela-body");
-let sumP=0, sumT=0;
-boletos.forEach(b => {
-  const f = getFaixa(b.dias);
-  sumP += b.principal; sumT += b.total;
-  tbody.innerHTML += `<tr><td>${b.cliente}</td><td class="right">${fmt(b.principal)}</td><td class="right">${fmt(b.total)}</td><td class="center">${b.pct||'&mdash;'}</td><td class="center">${b.dias}</td><td><span class="badge ${f.cls}">${f.label}</span></td><td class="previsao">${b.previsao||'&mdash;'}</td></tr>`;
-});
+// ===== Render principal =====
+function aplicarFiltros() {
+  const filtrados = boletos.filter(b => {
+    if (estado.busca && !b.cliente.toLowerCase().includes(estado.busca)) return false;
+    if (estado.cliente && b.cliente !== estado.cliente) return false;
+    if (!estado.faixasAtivas.has(getFaixaIdx(b.dias))) return false;
+    if (estado.previsao === 'com' && !b.previsao) return false;
+    if (estado.previsao === 'sem' && b.previsao) return false;
+    return true;
+  });
 
-document.getElementById("tot-principal").textContent = fmt(totalizador ? totalizador.principal : sumP);
-document.getElementById("tot-juros").textContent     = fmt(totalizador ? totalizador.total     : sumT);
-document.getElementById("grand-total-subtitle").textContent = fmt(totalizador ? totalizador.total : grandTotal);
+  const totals = faixas.map((f,i) => filtrados.filter(b => getFaixaIdx(b.dias) === i).reduce((a,b) => a+b.total, 0));
+  const grandTotal = totals.reduce((a,b) => a+b, 0);
+  const pcts = totals.map(t => grandTotal > 0 ? +((t/grandTotal)*100).toFixed(1) : 0);
+
+  // KPIs
+  ["v1","v2","v3","v4"].forEach((id,i) => {
+    document.getElementById(id).textContent = fmt(totals[i]);
+    document.getElementById("p"+(i+1)).textContent = pcts[i] + "% do total";
+  });
+  document.querySelectorAll('.kpi').forEach(k => k.classList.toggle('inativo', !estado.faixasAtivas.has(+k.dataset.faixa)));
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('ativo', estado.faixasAtivas.has(+c.dataset.faixa)));
+
+  // Gráficos
+  chartDoughnut.data.datasets[0].data = pcts;
+  chartDoughnut.update();
+  chartBar.data.datasets[0].data = totals;
+  chartBar.update();
+
+  // Legendas
+  const leg1 = document.getElementById("legend1"); leg1.innerHTML = '';
+  const leg2 = document.getElementById("legend2"); leg2.innerHTML = '';
+  faixas.forEach((f,i) => {
+    leg1.innerHTML += `<div class="leg-item"><div class="leg-left"><div class="leg-dot" style="background:${f.color}"></div><span>${f.label}</span></div><span class="leg-val">${pcts[i]}% &middot; ${fmt(totals[i])}</span></div>`;
+    leg2.innerHTML += `<div class="leg-item"><div class="leg-left"><div class="leg-dot" style="background:${f.color}"></div><span>${f.label}</span></div><span class="leg-val">${fmt(totals[i])}</span></div>`;
+  });
+
+  // Tabela (ordenada por dias de atraso, decrescente)
+  const tbody = document.getElementById("tabela-body");
+  tbody.innerHTML = '';
+  let sumP = 0, sumT = 0;
+  if (filtrados.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="vazio">Nenhum boleto encontrado com os filtros aplicados.</td></tr>';
+  } else {
+    [...filtrados].sort((a,b) => b.dias - a.dias).forEach(b => {
+      const f = faixas[getFaixaIdx(b.dias)];
+      sumP += b.principal; sumT += b.total;
+      const pctLinha = grandTotal > 0 ? ((b.total/grandTotal)*100).toFixed(2).replace('.',',') + '%' : '&mdash;';
+      tbody.innerHTML += `<tr><td>${b.cliente}</td><td class="right">${fmt(b.principal)}</td><td class="right">${fmt(b.total)}</td><td class="center">${pctLinha}</td><td class="center">${b.dias}</td><td><span class="badge ${f.cls}">${f.label}</span></td><td class="previsao">${b.previsao||'&mdash;'}</td></tr>`;
+    });
+  }
+
+  // Totais do rodapé refletem o conjunto filtrado
+  document.getElementById("tot-principal").textContent = fmt(sumP);
+  document.getElementById("tot-juros").textContent     = fmt(sumT);
+
+  // Contador e resumo
+  document.getElementById("contador").textContent = filtrados.length + ' de ' + boletos.length + ' boletos';
+  const temFiltro = estado.busca || estado.cliente || estado.previsao || estado.faixasAtivas.size < 4;
+  const pctGeral = (totalizador && totalizador.total > 0) ? ((sumT/totalizador.total)*100).toFixed(1).replace('.',',') : '0';
+  document.getElementById("resumo-filtro").innerHTML = temFiltro
+    ? `Exibindo <strong>${filtrados.length}</strong> de ${boletos.length} boletos &middot; soma filtrada: <strong>${fmt(sumT)}</strong> (${pctGeral}% do total geral)`
+    : `Exibindo todos os <strong>${boletos.length}</strong> boletos.`;
+}
+
+// ===== Inicialização =====
+document.getElementById("grand-total-subtitle").textContent = fmt(totalizador ? totalizador.total : boletos.reduce((a,b)=>a+b.total,0));
+aplicarFiltros();
+
+// Em modo PDF, converte os gráficos em imagens estáticas após o primeiro render
+if (MODO_PDF) {
+  setTimeout(() => {
+    [chartDoughnut.canvas, chartBar.canvas].forEach(canvas => {
+      const img = document.createElement('img');
+      img.src = canvas.toDataURL('image/png');
+      img.style.width = '100%';
+      img.style.height = '100%';
+      canvas.parentNode.replaceChild(img, canvas);
+    });
+  }, 150);
+}
 </script>
 </body>
 </html>
