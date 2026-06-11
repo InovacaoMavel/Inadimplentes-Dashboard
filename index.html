@@ -233,7 +233,7 @@ const rawItems = [{"cliente":"Pure Brokers Factor Ltda","principal":"R$ 337,49"
 const HOJE_ISO = '2026-06-11';
 
 // Modo PDF: definido no Code node ou via ?pdf=1 na URL
-const MODO_PDF = false || new URLSearchParams(location.search).get('pdf') === '1';
+const MODO_PDF = true || new URLSearchParams(location.search).get('pdf') === '1';
 if (MODO_PDF) document.body.classList.add('modo-pdf');
 
 function parseMoney(v) {
