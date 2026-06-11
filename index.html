@@ -57,6 +57,29 @@
   .previsao-vencida { color: var(--vermelho); font-weight: 600; }
   tfoot td { font-weight: 700; background: #f1f5f9 !important; }
 
+  /* Altura dos gráficos por tamanho de tela */
+  .chart-box { position: relative; height: 240px; }
+
+  /* ===== Cards mobile da listagem ===== */
+  .boleto-card { border: 1px solid #e9edf3; border-radius: 12px; padding: 12px 14px; background: #fff; }
+  .boleto-card.critico { border-left: 4px solid var(--vermelho); }
+  .boleto-card .nome { font-weight: 600; font-size: 14px; line-height: 1.25; }
+  .boleto-card .valor { font-size: 17px; font-weight: 600; }
+  .boleto-card .linha { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .boleto-card .meta { font-size: 11px; color: #64748b; }
+
+  /* ===== Ajustes mobile ===== */
+  @media (max-width: 767.98px) {
+    .hero { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+    .hero .total-valor { font-size: 26px; }
+    .aging-seg { font-size: 9px; }
+    .ke .v { font-size: 16px; }
+    .ke .card-body { padding: 10px 12px !important; }
+    .chart-box { height: 200px; }
+    .btn-acoes { width: 100%; }
+    .btn-acoes .btn { flex: 1; }
+  }
+
   body.modo-pdf .so-tela { display: none !important; }
   body.modo-pdf .aging-seg, body.modo-pdf thead th[data-sort] { cursor: default; }
   @media print {
@@ -127,9 +150,11 @@
           <div class="d-flex flex-wrap gap-1" id="chips-faixa"></div>
         </div>
         <div class="col-12 d-flex flex-wrap gap-2 align-items-center">
-          <button class="btn btn-sm btn-outline-secondary" id="btn-limpar"><i class="bi bi-x-circle me-1"></i>Limpar filtros</button>
-          <button class="btn btn-sm btn-primary" id="btn-csv"><i class="bi bi-download me-1"></i>Exportar CSV</button>
-          <span class="small text-secondary ms-auto" id="resumo-filtro"></span>
+          <div class="d-flex gap-2 btn-acoes">
+            <button class="btn btn-sm btn-outline-secondary" id="btn-limpar"><i class="bi bi-x-circle me-1"></i>Limpar filtros</button>
+            <button class="btn btn-sm btn-primary" id="btn-csv"><i class="bi bi-download me-1"></i>Exportar CSV</button>
+          </div>
+          <span class="small text-secondary ms-md-auto" id="resumo-filtro"></span>
         </div>
       </div>
     </div>
@@ -140,13 +165,13 @@
     <div class="col-lg-6">
       <div class="card h-100"><div class="card-body">
         <h2 class="text-label text-secondary mb-3">Valor por faixa de atraso</h2>
-        <div style="position:relative;height:240px"><canvas id="ch-faixa"></canvas></div>
+        <div class="chart-box"><canvas id="ch-faixa"></canvas></div>
       </div></div>
     </div>
     <div class="col-lg-6">
       <div class="card h-100"><div class="card-body">
         <h2 class="text-label text-secondary mb-3">Top devedores <span class="so-tela fw-normal text-lowercase" style="letter-spacing:0">&middot; clique na barra para filtrar</span></h2>
-        <div style="position:relative;height:240px"><canvas id="ch-top"></canvas></div>
+        <div class="chart-box"><canvas id="ch-top"></canvas></div>
       </div></div>
     </div>
   </div>
@@ -156,9 +181,20 @@
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 pb-2 border-bottom">
         <h2 class="text-label text-dark mb-0" style="font-size:12px">Boletos em atraso</h2>
-        <span class="badge text-bg-light text-secondary" id="contador"></span>
+        <div class="d-flex align-items-center gap-2">
+          <select class="form-select form-select-sm d-md-none so-tela" id="f-ordem" style="width:auto">
+            <option value="dias|-1">Mais atrasados</option>
+            <option value="dias|1">Menos atrasados</option>
+            <option value="total|-1">Maior valor</option>
+            <option value="total|1">Menor valor</option>
+            <option value="cliente|1">Cliente (A&ndash;Z)</option>
+            <option value="previsao|1">Previsão</option>
+          </select>
+          <span class="badge text-bg-light text-secondary" id="contador"></span>
+        </div>
       </div>
-      <div class="table-responsive">
+      <!-- Desktop: tabela -->
+      <div class="table-responsive d-none d-md-block">
         <table class="table table-hover align-middle mb-0">
           <thead class="table-light"><tr>
             <th data-sort="cliente">Cliente <span class="seta"></span></th>
@@ -177,6 +213,14 @@
             <td></td><td></td><td></td><td></td>
           </tr></tfoot>
         </table>
+      </div>
+      <!-- Mobile: lista de cards -->
+      <div class="d-md-none">
+        <div class="d-flex flex-column gap-2" id="lista-mobile"></div>
+        <div class="d-flex justify-content-between align-items-baseline mt-3 pt-2 border-top">
+          <span class="text-label text-secondary">Total (Principal + Juros)</span>
+          <span class="fw-bold num" id="tot-mobile"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -313,9 +357,23 @@ document.querySelectorAll('thead th[data-sort]').forEach(th => {
     const key = th.dataset.sort;
     if (estado.sort.key === key) estado.sort.dir *= -1;
     else { estado.sort.key = key; estado.sort.dir = (key === 'cliente' || key === 'previsao') ? 1 : -1; }
+    sincronizarOrdemMobile();
     aplicarFiltros();
   });
 });
+
+// Ordenação mobile (select)
+const selOrdem = document.getElementById('f-ordem');
+selOrdem.addEventListener('change', e => {
+  const [key, dir] = e.target.value.split('|');
+  estado.sort.key = key;
+  estado.sort.dir = parseInt(dir, 10);
+  aplicarFiltros();
+});
+function sincronizarOrdemMobile() {
+  const v = estado.sort.key + '|' + estado.sort.dir;
+  if ([...selOrdem.options].some(o => o.value === v)) selOrdem.value = v;
+}
 
 // Export CSV da visão filtrada
 document.getElementById('btn-csv').addEventListener('click', () => {
@@ -357,7 +415,7 @@ const chartTop = new Chart(document.getElementById('ch-top'), {
     plugins: { legend: {display:false}, tooltip: {callbacks:{label: ctx => ' ' + fmt(ctx.parsed.x)}} },
     scales: {
       x: { ticks:{color:'#64748b',font:{size:10,family:"'IBM Plex Mono'"}, callback: v=>fmtK(v)}, grid:{color:'#eef1f6'} },
-      y: { ticks:{color:'#334155',font:{size:11,family:"'IBM Plex Sans'"}, callback: function(v){ const l = this.getLabelForValue(v); return l.length > 22 ? l.slice(0,21) + '\u2026' : l; }}, grid:{display:false} }
+      y: { ticks:{color:'#334155',font:{size:11,family:"'IBM Plex Sans'"}, callback: function(v){ const max = window.innerWidth < 768 ? 13 : 22; const l = this.getLabelForValue(v); return l.length > max ? l.slice(0, max - 1) + '\u2026' : l; }}, grid:{display:false} }
     },
     onClick: (evt, els) => {
       if (MODO_PDF || !els.length) return;
@@ -431,9 +489,12 @@ function aplicarFiltros() {
   });
 
   const tbody = document.getElementById('tabela-body');
+  const listaMobile = document.getElementById('lista-mobile');
   tbody.innerHTML = '';
+  listaMobile.innerHTML = '';
   if (!ordenados.length) {
     tbody.innerHTML = '<tr><td colspan="7" class="text-center text-secondary py-4">Nenhum boleto encontrado com os filtros aplicados.</td></tr>';
+    listaMobile.innerHTML = '<div class="text-center text-secondary py-4 small">Nenhum boleto encontrado com os filtros aplicados.</div>';
   } else {
     const maxShare = grandTotal > 0 ? Math.max(...ordenados.map(b=>b.total/grandTotal)) : 1;
     ordenados.forEach(b => {
@@ -442,6 +503,7 @@ function aplicarFiltros() {
       const barW = maxShare > 0 ? (b.total/grandTotal)/maxShare*100 : 0;
       const juros = b.total - b.principal;
       const prevVencida = b.previsaoISO && b.previsaoISO < HOJE_ISO;
+      // Linha da tabela (desktop)
       tbody.innerHTML += `<tr class="${fi === 3 ? 'critico' : ''}">
         <td>${esc(b.cliente)}</td>
         <td class="text-end num">${fmt(b.principal)}</td>
@@ -451,11 +513,28 @@ function aplicarFiltros() {
         <td><span class="badge rounded-pill ${f.cls}">${f.label}</span></td>
         <td class="small ${prevVencida ? 'previsao-vencida' : 'text-secondary'}">${b.previsao ? esc(b.previsao) + (prevVencida ? ' \u26a0' : '') : '\u2014'}</td>
       </tr>`;
+      // Card (mobile)
+      listaMobile.innerHTML += `<div class="boleto-card ${fi === 3 ? 'critico' : ''}">
+        <div class="linha mb-1">
+          <span class="nome">${esc(b.cliente)}</span>
+          <span class="badge rounded-pill ${f.cls} flex-shrink-0">${b.dias}d</span>
+        </div>
+        <div class="linha">
+          <span class="valor num">${fmt(b.total)}</span>
+          <span class="meta num">${pct.toFixed(1).replace('.',',')}% do filtrado</span>
+        </div>
+        <div class="pct-bar my-2"><i style="width:${barW}%"></i></div>
+        <div class="linha meta">
+          <span>Principal ${fmt(b.principal)} <span class="text-danger">+${fmt(juros)} juros</span></span>
+          <span class="${prevVencida ? 'previsao-vencida' : ''}">${b.previsao ? 'Prev. ' + esc(b.previsao) + (prevVencida ? ' \u26a0' : '') : 'Sem previsão'}</span>
+        </div>
+      </div>`;
     });
   }
 
   document.getElementById('tot-principal').textContent = fmt(sumP);
   document.getElementById('tot-juros').textContent = fmt(grandTotal);
+  document.getElementById('tot-mobile').textContent = fmt(grandTotal);
   document.getElementById('contador').textContent = filtrados.length + ' de ' + boletos.length + ' boletos';
 
   const temFiltro = estado.busca || estado.cliente || estado.previsao || estado.faixasAtivas.size < 4;
