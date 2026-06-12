@@ -97,7 +97,7 @@
     <div class="row align-items-start g-3">
       <div class="col-md">
         <h1 class="h5 fw-bold mb-1"><i class="bi bi-clipboard2-data me-2"></i>Relatório de Inadimplência</h1>
-        <div class="small text-white-50">Mavel Locadora &middot; gerado em 12/06/2026 &middot; atualizado às 13:35 <span class="so-tela" id="refresh-info"></span></div>
+        <div class="small text-white-50">Mavel Locadora &middot; gerado em 12/06/2026 &middot; atualizado às 15:02</div>
       </div>
       <div class="col-md-auto text-md-end">
         <div class="text-label text-white-50">Total em aberto</div>
@@ -557,38 +557,6 @@ function esc(s) {
 
 // ===== Inicialização =====
 aplicarFiltros();
-
-// ===== Auto-refresh a cada 15 minutos =====
-// Recarrega a página para buscar dados novos do n8n.
-// Desativado em modo PDF (snapshot único) e quando a aba está em segundo plano
-// (recarrega imediatamente ao voltar, se o tempo já passou).
-const REFRESH_MIN = 15;
-if (!MODO_PDF) {
-  const proximaAtt = Date.now() + REFRESH_MIN * 60 * 1000;
-
-  function recarregar() {
-    const u = new URL(location.href);
-    u.searchParams.set('_ts', Date.now()); // cache-busting
-    location.replace(u.toString());
-  }
-
-  function atualizarContador() {
-    const restanteMs = proximaAtt - Date.now();
-    if (restanteMs <= 0) {
-      if (document.visibilityState === 'visible') recarregar();
-      return;
-    }
-    const min = Math.ceil(restanteMs / 60000);
-    document.getElementById('refresh-info').textContent =
-      '\u00b7 pr\u00f3xima atualiza\u00e7\u00e3o em ' + min + ' min';
-  }
-
-  atualizarContador();
-  setInterval(atualizarContador, 30 * 1000);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && Date.now() >= proximaAtt) recarregar();
-  });
-}
 
 // Em modo PDF, converte os gráficos em imagens estáticas após o primeiro render
 if (MODO_PDF) {
